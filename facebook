@@ -54,9 +54,9 @@ so we can see for example, the first 4 parameters (_nc_cat, ccb, _nc_sid, efg) a
 i also omitted the bytestart and byteend since it doesnt matter for downloading the entire vod.
 
 what are these parameters used for?
-_nc_ things are probably for when you have cookies disabled (nc = nocookie)
-oh, gives "Bad URL hash" when omitted. a hash, but no idea what it's a hash of. ( h = hash?)
-oe, gives "Bad URL timestamp" when omitted. maybe this is an expiration. (e = expires / expiration ?)
+  _nc_ things are probably for when you have cookies disabled (nc = nocookie)
+  oh, gives "Bad URL hash" when omitted. a hash, but no idea what it's a hash of. ( h = hash?)
+  oe, gives "Bad URL timestamp" when omitted. maybe this is an expiration. (e = expires / expiration ?)
 
 so of the original 10 paramters on the url, we can bring it down to 4:
   url: https://video.fatl1-1.fna.fbcdn.net/v/t39.25447-2/10000000_2583202581988395_2403213269603213930_n.mp4
