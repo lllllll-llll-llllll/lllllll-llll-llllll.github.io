@@ -70,16 +70,19 @@ when formatted back into a url...
 it will let us watch the vod in our browser, that's great.
 
 so the problem is now, how do i know what the (_nc_ohc, _nc_ht, oh, oe) values are going to be?
-they are in the base html file that is downloaded originally when we visited the url in our browser.
+usually they are tucked away in the original html somewhere.
+if not, then they are returned to us as a json response.
+if you dont see any json files in the network monitor preceding the mp4 files, then it's probably in the html.
 
 to download that html file with curl, right click the mp4 in network monitor, go to Copy, then Copy as CURL for Windows.
-crucially, it includes this header information: 
+crucially, it includes this header information that is necessary for our purposes:
   -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-without that header, you will get a crappy file. for my example it was only 262kb.
+without that header, you will get a crappy html file that is only 200kb, but the juicy one we need is over 600kb.
 
-in this html file, we can ctrl-f for the values we are looking for.
-the first result you will find is like some json info with different mp4 links and some metadata.
-it looks something like this, (when forced through a json formatter/validator!):
+in this juicy 668kb html file, we can ctrl-f for the values we are looking for.
+everything javascript is obfuscated and nothing looks readable, but the first result you will find
+is like some super long line containing json info with different mp4 links and some metadata.
+it looks something like this when forced through a json formatter/validator:
 
 "extensions":{
   "prefetch_dash_segments":[
