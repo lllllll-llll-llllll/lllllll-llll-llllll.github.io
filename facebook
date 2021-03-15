@@ -1,0 +1,154 @@
+downloading facebook vods
+
+this is what i learned scraping facebook stream vods. it might work for normal non-streamed videos as well.
+
+the test video i used was this:
+  https://www.facebook.com/FuriaGamesOficial/videos/426730845296323
+
+with network monitor opened, and cache disabled, we can navigate to this page to see what all loads.
+when looking at the "TYPE" of all these things, it should look like this:
+  > html
+  > css
+  > lots of javascript files
+  > various mp4 files
+  > etc
+  
+we are only interested in the mp4 files. if you click on them, you can view the url which looks like this:
+https://video.fatl1-1.fna.fbcdn.net/v/t39.25447-2/10000000_2583202581988395_2403213269603213930_n.mp4?_nc_cat=111&ccb=1-3&_nc_sid=5aebc0&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjRfNXNlY2dvcF9ocTVfZnJhZ18yX3ZpZGVvIn0=&_nc_ohc=aUBM7Q4OeCoAX8OL56J&_nc_ht=video.fatl1-1.fna&oh=b66474440e6af04de421287e930e48a2&oe=607494BF&bytestart=0&byteend=946
+
+which isn't at al readable but you can just copy and paste the GET info section.
+below i have formatted it a little more though:
+
+  url: https://video.fatl1-1.fna.fbcdn.net/v/t39.25447-2/10000000_2583202581988395_2403213269603213930_n.mp4
+  _nc_cat: 111
+  ccb: 1-3
+  _nc_sid: 5aebc0
+  efg: eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjRfNXNlY2dvcF9ocTVfZnJhZ18yX3ZpZGVvIn0
+  _nc_ohc: aUBM7Q4OeCoAX8OL56J
+  _nc_ht: video.fatl1-1.fna
+  oh: b66474440e6af04de421287e930e48a2
+  oe: 607494BF
+  bytestart: 0
+  byteend: 946
+
+these are mostly url parameters. you can play around and omit certain parameters to see what happens. maybe we dont need all those things?
+below you can see what i have tried:
+
+  _nc_cat			o	o	o	o	o	o	o	o	-	-	o	-	-	-	-	-									
+  ccb			  	o	o	o	o	o	o	o	-	o	-	-	-	-	-	-	-								
+  _nc_sid			o	o	o	o	o	o	-	o	o	o	-	-	-	-	-	-								
+  efg			  	o	o	o	o	o	-	o	o	o	o	-	-	-	-	-	-								
+  _nc_ohc			o	o	o	o	-	o	o	o	o	o	o	o	-	o	o	o								
+  _nc_ht			o	o	o	-	o	o	o	o	o	o	o	o	o	-	o	o								
+  oh			  	o	o	-	o	o	o	o	o	o	o	o	o	o	o	-	o								
+  oe			  	o	-	o	o	o	o	o	o	o	o	o	o	o	o	o	-																					
+  -------------------------------------------	
+  result			.	a	b	a	a	.	.	.	.	c	.	.	a	a	b	c						
+  -------------------------------------------
+  . -	success
+  a - URL signature mismatch
+  b - Bad URL hash
+  c - Bad URL timestamp
+
+so we can see for example, the first 4 parameters (_nc_cat, ccb, _nc_sid, efg) are optional.
+i also omitted the bytestart and byteend since it doesnt matter for downloading the entire vod.
+
+what are these parameters used for?
+_nc_ things are probably for when you have cookies disabled (nc = nocookie)
+oh, gives "Bad URL hash" when omitted. no idea what it's a hash of. ( h = hash?)
+oe, gives "Bad URL timestamp" when omitted. so maybe this is an expiration value? (e = expires / expiration ?)
+
+so of the original 10 paramters on the url, we can bring it down to 4:
+  url: https://video.fatl1-1.fna.fbcdn.net/v/t39.25447-2/10000000_2583202581988395_2403213269603213930_n.mp4
+  _nc_ohc: aUBM7Q4OeCoAX8OL56J
+  _nc_ht: video.fatl1-1.fna
+  oh: b66474440e6af04de421287e930e48a2
+  oe: 607494BF
+  
+when formatted back into a url...
+  url: https://video.fatl1-1.fna.fbcdn.net/v/t39.25447-2/10000000_2583202581988395_2403213269603213930_n.mp4?_nc_ohc=aUBM7Q4OeCoAX8OL56J&_nc_ht=video.fatl1-1.fna&oh=b66474440e6af04de421287e930e48a2&oe=607494BF
+it will let us watch the vod in our browser, that's great.
+
+so the problem is now, how do i know what the (_nc_ohc, _nc_ht, oh, oe) values are going to be?
+they are in the base html file that is downloaded originally when we visited the url in our browser.
+
+to download that html file with curl, right click the mp4 in network monitor, go to Copy, then Copy as CURL for Windows.
+crucially, it includes this header information: 
+  -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+without that header, you will get a crappy file. for my example it was only 262kb.
+
+in this html file, we can ctrl-f for the values we are looking for.
+the first result you will find is like some json info with different mp4 links and some metadata.
+it looks something like this, (when forced through a json formatter/validator!):
+
+"extensions":{
+  "prefetch_dash_segments":[
+     {
+        "video":[
+           {
+              "url":"https:\/\/video.fatl1-1.fna.fbcdn.net\/v\/t39.25447-2\/10000000_2583202581988395_2403213269603213930_n.mp4?_nc_cat=111&ccb=1-3&_nc_sid=5aebc0&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjRfNXNlY2dvcF9ocTVfZnJhZ18yX3ZpZGVvIn0\u00253D&_nc_ohc=aUBM7Q4OeCoAX8OL56J&_nc_ht=video.fatl1-1.fna&oh=b66474440e6af04de421287e930e48a2&oe=607494BF",
+              "start":0,
+              "end":946,
+              "representation_id":"258991832609774v",
+              "segment_type":"init",
+              "mime_codec":"video\/mp4; codecs=\"avc1.4D4028\""
+           },
+           {
+              "url":"https:\/\/video.fatl1-1.fna.fbcdn.net\/v\/t39.25447-2\/10000000_2583202581988395_2403213269603213930_n.mp4?_nc_cat=111&ccb=1-3&_nc_sid=5aebc0&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjRfNXNlY2dvcF9ocTVfZnJhZ18yX3ZpZGVvIn0\u00253D&_nc_ohc=aUBM7Q4OeCoAX8OL56J&_nc_ht=video.fatl1-1.fna&oh=b66474440e6af04de421287e930e48a2&oe=607494BF",
+              "start":947,
+              "end":2070,
+              "representation_id":"258991832609774v",
+              "segment_type":"sidx",
+              "mime_codec":"video\/mp4; codecs=\"avc1.4D4028\""
+           },
+           {
+              "url":"https:\/\/video.fatl1-1.fna.fbcdn.net\/v\/t39.25447-2\/10000000_2583202581988395_2403213269603213930_n.mp4?_nc_cat=111&ccb=1-3&_nc_sid=5aebc0&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfdjRfNXNlY2dvcF9ocTVfZnJhZ18yX3ZpZGVvIn0\u00253D&_nc_ohc=aUBM7Q4OeCoAX8OL56J&_nc_ht=video.fatl1-1.fna&oh=b66474440e6af04de421287e930e48a2&oe=607494BF",
+              "start":2071,
+              "end":1366247,
+              "representation_id":"258991832609774v",
+              "segment_type":"data",
+              "mime_codec":"video\/mp4; codecs=\"avc1.4D4028\""
+           }
+        ],
+        "audio":[
+           {
+              "url":"https:\/\/video.fatl1-1.fna.fbcdn.net\/v\/t42.1790-2\/153056270_1628435637348340_4960894280265608938_n.mp4?_nc_cat=1&ccb=1-3&_nc_sid=5aebc0&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfYXVkaW9fYWFjcF82NF9mcmFnXzJfYXVkaW8ifQ\u00253D\u00253D&_nc_ohc=mgHRWZ4E5ekAX9HEaoK&_nc_ht=video.fatl1-1.fna&oh=5d8ca66660877774081184041a1e076c&oe=6050043F",
+              "start":0,
+              "end":906,
+              "representation_id":"1628435634015007a",
+              "segment_type":"init",
+              "mime_codec":"audio\/mp4; codecs=\"mp4a.40.5\""
+           },
+           {
+              "url":"https:\/\/video.fatl1-1.fna.fbcdn.net\/v\/t42.1790-2\/153056270_1628435637348340_4960894280265608938_n.mp4?_nc_cat=1&ccb=1-3&_nc_sid=5aebc0&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfYXVkaW9fYWFjcF82NF9mcmFnXzJfYXVkaW8ifQ\u00253D\u00253D&_nc_ohc=mgHRWZ4E5ekAX9HEaoK&_nc_ht=video.fatl1-1.fna&oh=5d8ca66660877774081184041a1e076c&oe=6050043F",
+              "start":907,
+              "end":3662,
+              "representation_id":"1628435634015007a",
+              "segment_type":"sidx",
+              "mime_codec":"audio\/mp4; codecs=\"mp4a.40.5\""
+           },
+           {
+              "url":"https:\/\/video.fatl1-1.fna.fbcdn.net\/v\/t42.1790-2\/153056270_1628435637348340_4960894280265608938_n.mp4?_nc_cat=1&ccb=1-3&_nc_sid=5aebc0&efg=eyJ2ZW5jb2RlX3RhZyI6ImRhc2hfYXVkaW9fYWFjcF82NF9mcmFnXzJfYXVkaW8ifQ\u00253D\u00253D&_nc_ohc=mgHRWZ4E5ekAX9HEaoK&_nc_ht=video.fatl1-1.fna&oh=5d8ca66660877774081184041a1e076c&oe=6050043F",
+              "start":3663,
+              "end":20066,
+              "representation_id":"1628435634015007a",
+              "segment_type":"data",
+              "mime_codec":"audio\/mp4; codecs=\"mp4a.40.5\""
+           }
+        ]
+     }
+  ],
+
+so one section is for video and the other audio. and you can check the urls and see it is indeed video with no audio and vice versa.
+
+so facebook just give us the urls with all the parameters in one place. really convenient.
+why was i playing around with the parameters earlier i wonder?
+
+continued...
+
+
+
+
+
+
+
