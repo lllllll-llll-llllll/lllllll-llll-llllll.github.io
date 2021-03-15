@@ -78,6 +78,8 @@ to download that html file with curl, right click the mp4 in network monitor, go
 crucially, it includes this header information that is necessary for our purposes:
   -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 without that header, you will get a crappy html file that is only 200kb, but the juicy one we need is over 600kb.
+as always with this "copy as curl" thing, you need to add the -o output flag to make it save to file
+so it should look like curl -o "output.html" "url here"
 
 in this juicy 668kb html file, we can ctrl-f for the values we are looking for.
 everything javascript is obfuscated and nothing looks readable, but the first result you will find
