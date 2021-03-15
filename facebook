@@ -34,16 +34,16 @@ below i have formatted it a little more though:
 these are mostly url parameters. you can play around and omit certain parameters to see what happens. maybe we dont need all those things?
 below you can see what i have tried:
 
-  _nc_cat			o	o	o	o	o	o	o	o	-	-	o	-	-	-	-	-									
-  ccb			  	o	o	o	o	o	o	o	-	o	-	-	-	-	-	-	-								
-  _nc_sid			o	o	o	o	o	o	-	o	o	o	-	-	-	-	-	-								
-  efg			  	o	o	o	o	o	-	o	o	o	o	-	-	-	-	-	-								
-  _nc_ohc			o	o	o	o	-	o	o	o	o	o	o	o	-	o	o	o								
-  _nc_ht			o	o	o	-	o	o	o	o	o	o	o	o	o	-	o	o								
-  oh			  	o	o	-	o	o	o	o	o	o	o	o	o	o	o	-	o								
-  oe			  	o	-	o	o	o	o	o	o	o	o	o	o	o	o	o	-																					
+  _nc_cat	o	o	o	o	o	o	o	o	-	-	o	-	-	-	-	-									
+  ccb			 o	o	o	o	o	o	o	-	o	-	-	-	-	-	-	-								
+  _nc_sid	o	o	o	o	o	o	-	o	o	o	-	-	-	-	-	-								
+  efg			 o	o	o	o	o	-	o	o	o	o	-	-	-	-	-	-								
+  _nc_ohc	o	o	o	o	-	o	o	o	o	o	o	o	-	o	o	o								
+  _nc_ht	o	o	o	-	o	o	o	o	o	o	o	o	o	-	o	o								
+  oh				o	o	-	o	o	o	o	o	o	o	o	o	o	o	-	o								
+  oe			 o	-	o	o	o	o	o	o	o	o	o	o	o	o	o	-																					
   -------------------------------------------	
-  result			.	a	b	a	a	.	.	.	.	c	.	.	a	a	b	c						
+  result	.	a	b	a	a	.	.	.	.	c	.	.	a	a	b	c						
   -------------------------------------------
   . -	success
   a - URL signature mismatch
